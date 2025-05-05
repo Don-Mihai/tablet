@@ -5,15 +5,11 @@ import axios from 'axios';
 export default function Main() {
   const handleStartClick = async () => {
     try {
-      // Формируем KE-команду для отправки
-      const keCommand = 'KE start-video';
-
-      // Шлём простым POST-запросом на второй сайт
-      // Замените URL на адрес вашего второго приложения
-      await axios.post(
-        'http://localhost:3001/api/ke', // endpoint приёма команд
-        keCommand, // тело запроса — строка с командой
-        { headers: { 'Content-Type': 'text/plain' } }
+      await axios.get(
+        'http://192.168.0.10:2424/cmd.cgi?user=admin&psw=Jerome&cmd=KE,10,1',
+        {
+          headers: { 'Content-Type': 'text/plain' },
+        }
       );
     } catch (error) {
       console.error('Ошибка отправки KE‑команды:', error);
