@@ -1,18 +1,38 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './Main.module.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 // import Bottom from '../../components/Bottom/Bottom';
 
 const videos = [
-  { title: 'Главный', link: '/video/1' },
-  { title: 'Хронология', link: '/video/2' },
+  {
+    title: 'Главный',
+    link: '/video/1',
+    url: '/cmd.cgi?cmd=OUT,10,1',
+    init: '/cmd.cgi?cmd=OUT,10,0',
+  },
+  {
+    title: 'Хронология',
+    link: '/video/2',
+    url: '/cmd.cgi?cmd=OUT,11,1',
+    init: '/cmd.cgi?cmd=OUT,11,0',
+  },
 ];
 
 export default function Main() {
-  const handleStartClick = async () => {
+  const initVideos = async () => {
+    videos.forEach((video) => {
+      handleStartClick(video.init);
+    });
+  };
+
+  useEffect(() => {
+    initVideos();
+  }, []);
+
+  const handleStartClick = async (url) => {
     try {
-      await axios.get('http://192.168.0.10/cmd.cgi?cmd=OUT,10,1', {
+      await axios.get(url, {
         headers: { 'Content-Type': 'text/plain' },
       });
     } catch (error) {
@@ -22,7 +42,8 @@ export default function Main() {
 
   const navigate = useNavigate();
 
-  const handleVideoClick = (link) => {
+  const handleVideoClick = async (link, url) => {
+    await handleStartClick(url);
     navigate(link); // Переход к странице с видео
   };
 
@@ -39,7 +60,7 @@ export default function Main() {
         {videos.map((video, index) => (
           <button
             key={index}
-            onClick={() => handleVideoClick(video.link)}
+            onClick={() => handleVideoClick(video.link, video.url)}
             className={styles.button}
           >
             {video.title}
