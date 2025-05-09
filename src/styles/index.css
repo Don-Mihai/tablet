@@ -25,3 +25,7 @@ body {
   color: #fff;
   background: url(./bg.jpg) no-repeat center center fixed;
 }
+
+#root {
+  height: 100vh;
+}
