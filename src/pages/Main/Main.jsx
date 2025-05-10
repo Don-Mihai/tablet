@@ -1,77 +1,79 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Main.module.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-// import Bottom from '../../components/Bottom/Bottom';
 
 const videos = [
   {
     title: 'Главный',
     link: '/video/1',
-    url: '/cmd.cgi?cmd=OUT,10,1',
-    init: '/cmd.cgi?cmd=OUT,10,0',
+    onCmd: 'http://192.168.0.10/cmd.cgi?cmd=OUT,10,1',
+    offCmd: 'http://192.168.0.10/cmd.cgi?cmd=OUT,10,0',
   },
   {
     title: 'Хронология',
     link: '/video/2',
-    url: '/cmd.cgi?cmd=OUT,11,1',
-    init: '/cmd.cgi?cmd=OUT,11,0',
+    onCmd: 'http://192.168.0.10/cmd.cgi?cmd=OUT,11,1',
+    offCmd: 'http://192.168.0.10/cmd.cgi?cmd=OUT,11,0',
   },
+  // можно добавить сколько угодно роликов
 ];
 
 export default function Main() {
-  const initVideos = async () => {
-    videos.forEach((video) => {
-      handleStartClick(video.init);
-    });
-  };
+  const [activeIndex, setActiveIndex] = useState(null);
 
-  useEffect(() => {
-    initVideos();
-  }, []);
-
-  const handleStartClick = async (url) => {
+  // Универсальная функция отправки KE‑команды
+  const sendCommand = async (url) => {
     try {
       await axios.get(url, {
         headers: { 'Content-Type': 'text/plain' },
       });
-    } catch (error) {
-      console.error('Ошибка отправки KE‑команды:', error);
+    } catch (err) {
+      console.error('Ошибка при отправке команды:', err);
     }
   };
 
-  const navigate = useNavigate();
+  // Переключаем ролик: сначала отключаем старый, затем включаем новый
+  const switchVideo = async (newIndex) => {
+    // Отключаем предыдущий
+    if (activeIndex !== null) {
+      await sendCommand(videos[activeIndex].offCmd);
+    }
 
-  const handleVideoClick = async (link, url) => {
-    await handleStartClick(url);
-    navigate(link); // Переход к странице с видео
+    // Включаем новый
+    await sendCommand(videos[newIndex].onCmd);
+
+    // Сохраняем в state
+    setActiveIndex(newIndex);
   };
+
+  // При монтировании все ролики выключаем
+  useEffect(() => {
+    videos.forEach((video) => {
+      sendCommand(video.offCmd);
+    });
+  }, []);
 
   return (
     <div className={styles.container}>
       <div className={styles.top}>
-        {/* <h1 className={styles.title}>видео-ролик</h1> */}
         <p className={styles.description}>
           ВЫБЕРИТЕ РОЛИК, <br /> ЧТОБЫ ЗАПУСТИТЬ ЕГО НА ЭКРАНЕ
         </p>
       </div>
 
       <div className={styles.videos}>
-        {videos.map((video, index) => (
+        {videos.map((video, idx) => (
           <button
-            key={index}
-            onClick={() => handleVideoClick(video.link, video.url)}
-            className={styles.button}
+            key={idx}
+            onClick={() => switchVideo(idx)}
+            className={`${styles.button} ${
+              activeIndex === idx ? styles.active : ''
+            }`}
           >
             {video.title}
           </button>
         ))}
       </div>
-
-      {/* <button onClick={handleStartClick} className={styles.button}>
-        Начать просмотр
-      </button> */}
-      {/* <Bottom backUrl={`/`} /> */}
     </div>
   );
 }
