@@ -1,5 +1,6 @@
 .buttons {
-  position: relative;
+  position: absolute;
+  bottom: 0;
   padding: 10px 34px 32px 32px;
   display: flex;
   align-items: center;

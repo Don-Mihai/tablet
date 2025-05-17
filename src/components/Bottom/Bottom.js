@@ -4,15 +4,13 @@ import { useNavigate } from 'react-router-dom';
 
 const Bottom = ({ backUrl }) => {
   const navigate = useNavigate();
-  const handleBack = () => navigate(backUrl ? backUrl : '/main');
+  const handleBack = async () => {
+    navigate(backUrl ? backUrl : '/main');
+  };
 
   return (
     <div className={styles.buttons}>
-      <OutlinedButton
-        customClass={styles.backButton}
-        onClick={handleBack}
-        text={'Назад'}
-      />
+      <OutlinedButton customClass={styles.backButton} onClick={handleBack} text={'Назад'} />
     </div>
   );
 };

@@ -31,13 +31,13 @@
 }
 
 .videos {
+  margin-left: 140px;
   display: flex;
   flex-wrap: wrap;
-  gap: 77px;
+  gap: 50px;
 }
 
 .button {
-  margin-left: 140px;
   padding: 27px 60px;
   display: block;
   background-color: #7a0000;
